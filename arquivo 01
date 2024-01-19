@@ -1,0 +1,68 @@
+import openpyxl
+import pandas as pd
+
+# Caminho do arquivo
+caminho_arquivo = "/home/henrique/Downloads/Relatório_Completo.xlsx"
+
+# Colunas desejadas
+colunas_desejadas = [
+    'Data Atendimento',
+    'Código Atendimento',
+    'Paciente',
+    'Idade',
+    'ID amigo',
+    'Profissional',
+    'Forma de Pagamento',
+    'Item',
+    'Quantidade',
+    'Valor total do item R$',
+    'Número lote',
+    'Data envio',
+    'Data pagamento',
+    'Valor pago R$',
+    'Valor glosado R$',
+    'Mês pagamento',
+    'Recurso'
+]
+
+# Leitura do arquivo Excel com o uso explícito do engine 'openpyxl'
+df = pd.read_excel(caminho_arquivo, usecols=colunas_desejadas, engine='openpyxl')
+
+# Mapeamento de nomes de itens para 'Consulta Particular'
+consulta_mapping = {
+    'consulta a1': 'Consulta Particular',
+    'consulta 01': 'Consulta Particular',
+    'consulta 02': 'Consulta Particular',
+    'consulta 03': 'Consulta Particular'
+}
+
+# Substituição dos nomes de itens
+df['Item'] = df['Item'].str.lower().map(consulta_mapping).fillna(df['Item'])
+
+# Mapeamento de nomes de profissionais para CRMs
+crm_mapping = {
+    'Jefferson Jane Oliveira Sousa': 'CRM: 12727',
+    'Beda Barros Barkokebas': 'CRM: 20599',
+    'Breno Santiago Macedo': 'CRM: 17510',
+    'Claudio Henrique Fernandes Vidal': 'CRM: 13107'
+}
+
+# Substituição dos nomes pelo CRM
+df['Profissional'] = df['Profissional'].map(crm_mapping)
+
+# Ajuste do formato da coluna 'Idade' para exibir apenas a parte inteira
+df['Idade'] = df['Idade'].astype(float).astype(pd.Int32Dtype(), errors='ignore')
+
+# Cabeçalho extra
+cabecalho_extra = "Gruner - Grupo de Neurocirurgia do Recife"
+
+# Configurações de formatação para melhorar a visualização
+pd.set_option('display.max_columns', None)
+pd.set_option('display.expand_frame_repr', False)
+
+# Exibição do cabeçalho extra
+print(cabecalho_extra.center(df.shape[1] * 20))
+
+# Exibição da planilha com as colunas desejadas
+print(df.to_string(index=False, justify='center'))
+
